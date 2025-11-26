@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сканер XE - Анализ калорийности блюд</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary-color: #FF9800;
+            --light-color: #F5F5F5;
+            --dark-color: #333;
+            --text-color: #212121;
+            --border-radius: 8px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+        
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .balance {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .free-requests {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .main-content {
+            padding: 40px 0;
+        }
+        
+        .scanner-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: var(--border-radius);
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: #666;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .analysis-result {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .nutrition-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .nutrition-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .nutrition-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .payment-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .payment-amounts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .amount-btn {
+            padding: 15px;
+            background: var(--light-color);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .amount-btn:hover, .amount-btn.active {
+            border-color: var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .custom-amount {
+            margin-top: 15px;
+        }
+        
+        .custom-amount input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+        
+        .payment-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .info-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .offer-text {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .weight-input-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .user-panel {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .user-info {
+                text-align: center;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🍽️</div>
+                    <h1>Сканер XE</h1>
+                </div>
+                <div class="user-panel">
+                    <div class="user-info">
+                        <div class="balance">Баланс: <span id="userBalance">0</span> руб.</div>
+                        <div class="free-requests">Бесплатных анализов: <span id="freeRequests">10</span></div>
+                    </div>
+                    <button class="btn btn-outline" onclick="showSection('payment')">Пополнить</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Анализ калорийности блюд за секунды</h2>
+            <p>Просто сфотографируйте еду — и получите точные данные о калориях, белках, жирах, углеводах и хлебных единицах</p>
+            <button class="btn btn-primary" onclick="showSection('scanner')">Начать анализ</button>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Секция анализа фото -->
+            <section id="scanner-section" class="scanner-section">
+                <h2 class="section-title">Анализ фото блюда</h2>
+                
+                <div class="alert" id="scannerAlert"></div>
+                
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <h3>Загрузите фото блюда</h3>
+                    <p class="upload-text">Перетащите фото сюда или нажмите для выбора</p>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Анализируем фото...</p>
+                </div>
+                
+                <div class="analysis-result" id="analysisResult">
+                    <h3>Результат анализа:</h3>
+                    <div id="resultContent"></div>
+                    
+                    <div class="nutrition-grid" id="nutritionGrid"></div>
+                    
+                    <div class="weight-input-section" id="weightInputSection">
+                        <h4>Изменить вес блюда</h4>
+                        <p>Стоимость изменения: 1 рубль</p>
+                        <div class="custom-amount">
+                            <input type="number" id="weightInput" placeholder="Введите вес в граммах" min="1">
+                        </div>
+                        <button class="btn btn-primary" onclick="recalculateWeight()" style="margin-top: 10px;">
+                            Пересчитать
+                        </button>
+                    </div>
+                    
+                    <div class="nutrition-info">
+                        <button class="btn btn-outline" onclick="showWeightInput()" style="margin-top: 15px;">
+                            Изменить вес
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция оплаты -->
+            <section id="payment-section" class="payment-section" style="display: none;">
+                <h2 class="section-title">Пополнение баланса</h2>
+                
+                <div class="alert" id="paymentAlert"></div>
+                
+                <p>Выберите сумму для пополнения:</p>
+                
+                <div class="payment-amounts">
+                    <div class="amount-btn" onclick="selectAmount(50)">50 руб</div>
+                    <div class="amount-btn" onclick="selectAmount(100)">100 руб</div>
+                    <div class="amount-btn" onclick="selectAmount(500)">500 руб</div>
+                    <div class="amount-btn" onclick="selectAmount(1000)">1000 руб</div>
+                </div>
+                
+                <div class="custom-amount">
+                    <input type="number" id="customAmount" placeholder="Другая сумма" min="50">
+                </div>
+                
+                <button class="btn btn-primary" onclick="processPayment()" style="margin-top: 20px; width: 100%;">
+                    Перейти к оплате
+                </button>
+                
+                <div class="payment-result" id="paymentResult">
+                    <h4>Ссылка для оплаты:</h4>
+                    <a id="paymentLink" target="_blank" class="btn btn-primary" style="display: block; margin: 10px 0;">
+                        Перейти к оплате
+                    </a>
+                    <p>После оплаты нажмите кнопку ниже для проверки статуса</p>
+                    <button class="btn btn-outline" onclick="checkPayments()">
+                        Проверить платежи
+                    </button>
+                </div>
+            </section>
+
+            <!-- Секция информации -->
+            <section id="info-section" class="info-section" style="display: none;">
+                <h2 class="section-title">Информация и оферта</h2>
+                <div class="offer-text" id="offerText">
+                    <!-- Текст оферты будет загружен здесь -->
+                </div>
+            </section>
+
+            <!-- Админ-панель -->
+            <section id="admin-section" class="admin-section">
+                <h2 class="section-title">Админ-панель</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Всего пользователей</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalBalance">0</div>
+                        <div class="stat-label">Общий баланс</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="pendingPayments">0</div>
+                        <div class="stat-label">Ожидающих платежей</div>
+                    </div>
+                </div>
+                
+                <div class="custom-amount" style="margin-top: 20px;">
+                    <label>Минимальная сумма пополнения:</label>
+                    <input type="number" id="minAmountInput" placeholder="Текущая: 50 руб" min="10" max="10000">
+                </div>
+                
+                <button class="btn btn-primary" onclick="updateMinAmount()" style="margin-top: 10px;">
+                    Обновить минимальную сумму
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <!-- Модальное окно для авторизации -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h3>Вход в систему</h3>
+            <div class="custom-amount" style="margin: 20px 0;">
+                <input type="number" id="userIdInput" placeholder="Введите ваш ID" min="1">
+            </div>
+            <button class="btn btn-primary" onclick="login()" style="width: 100%;">
+                Войти
+            </button>
+        </div>
+    </div>
+
+    <footer style="background: var(--dark-color); color: white; padding: 30px 0; margin-top: 50px;">
+        <div class="container">
+            <div style="text-align: center;">
+                <p>Самозанятый Чумаков Дмитрий Евгеньевич</p>
+                <p>ИНН: 132610382652 | Email: it007.d@yandex.ru</p>
+                <p>Стоимость: 1 запрос = 1 рубль</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Конфигурация
+        const ROBOKASSA_LOGIN = "SkanerXEbot";
+        const MIN_PAYMENT_AMOUNT = 50;
+        const ADMINS = [2048942115, 6607418590];
+
+        // Текущий пользователь
+        let currentUser = {
+            id: null,
+            isAdmin: false
+        };
+
+        let currentAnalysisData = null;
+        let selectedAmount = 0;
+
+        // Локальная база данных в localStorage
+        const DB_KEYS = {
+            USER_BALANCES: 'user_balances',
+            USER_FREE_REQUESTS: 'user_free_requests',
+            PENDING_PAYMENTS: 'pending_payments',
+            USER_AI_RESULTS: 'user_ai_results'
+        };
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+            loadOfferText();
+            checkAuth();
+        });
+
+        // Работа с локальной БД
+        function loadData(key, defaultValue = {}) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                console.error('Error loading data:', e);
+                return defaultValue;
+            }
+        }
+
+        function saveData(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error('Error saving data:', e);
+                return false;
+            }
+        }
+
+        // Авторизация
+        function checkAuth() {
+            const savedUserId = localStorage.getItem('current_user_id');
+            if (savedUserId) {
+                loginWithId(parseInt(savedUserId));
+            } else {
+                showModal('loginModal');
+            }
+        }
+
+        function login() {
+            const userId = parseInt(document.getElementById('userIdInput').value);
+            if (!userId || userId < 1) {
+                alert('Введите корректный ID');
+                return;
+            }
+            loginWithId(userId);
+        }
+
+        function loginWithId(userId) {
+            currentUser.id = userId;
+            currentUser.isAdmin = ADMINS.includes(userId);
+            
+            localStorage.setItem('current_user_id', userId.toString());
+            closeModal('loginModal');
+            loadUserData();
+            
+            if (currentUser.isAdmin) {
+                document.getElementById('admin-section').style.display = 'block';
+                loadAdminStats();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('current_user_id');
+            currentUser.id = null;
+            currentUser.isAdmin = false;
+            showModal('loginModal');
+        }
+
+        // Настройка drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processImage(files[0]);
+                }
+            });
+        }
+
+        // Обработка выбора файла
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImage(file);
+            }
+        }
+
+        // Обработка изображения
+        function processImage(file) {
+            if (!file.type.match('image.*')) {
+                showAlert('scannerAlert', 'Пожалуйста, загрузите изображение', 'error');
+                return;
+            }
+
+            // Проверяем возможность анализа
+            if (!canAnalyze()) {
+                return;
+            }
+
+            // Показываем загрузку
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analysisResult').style.display = 'none';
+            document.getElementById('weightInputSection').style.display = 'none';
+            
+            // Скрываем alert
+            hideAlert('scannerAlert');
+
+            // Чтение файла как base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result.split(',')[1];
+                analyzeImageWithAI(imageData);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Проверка возможности анализа
+        function canAnalyze() {
+            const userBalances = loadData(DB_KEYS.USER_BALANCES);
+            const userFreeRequests = loadData(DB_KEYS.USER_FREE_REQUESTS);
+            
+            if (currentUser.isAdmin) {
+                return true;
+            }
+            
+            const freeRequests = userFreeRequests[currentUser.id] || 10;
+            const balance = userBalances[currentUser.id] || 0;
+            
+            if (freeRequests <= 0 && balance < 1) {
+                showAlert('scannerAlert', 
+                    'Недостаточно средств для анализа. Пополните баланс или дождитесь бесплатных запросов.', 
+                    'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Имитация анализа через AI (в реальном приложении здесь будет запрос к API)
+        async function analyzeImageWithAI(imageData) {
+            try {
+                // Имитация задержки анализа
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Генерация тестовых данных (в реальном приложении здесь будет вызов OpenAI API)
+                const mockAnalysis = generateMockAnalysis();
+                
+                document.getElementById('loading').style.display = 'none';
+                displayAnalysisResult(mockAnalysis);
+                
+                // Списание средств
+                deductAnalysisCost();
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                showAlert('scannerAlert', 'Ошибка при анализе фото', 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Генерация тестового анализа
+        function generateMockAnalysis() {
+            const dishes = [
+                {
+                    name: "Куриный суп с лапшой",
+                    ingredients: [
+                        { name: "куриный бульон", weight: 300 },
+                        { name: "курица", weight: 100 },
+                        { name: "лапша", weight: 50 },
+                        { name: "морковь", weight: 30 },
+                        { name: "лук", weight: 20 }
+                    ],
+                    totalWeight: 500
+                },
+                {
+                    name: "Салат овощной",
+                    ingredients: [
+                        { name: "помидоры", weight: 150 },
+                        { name: "огурцы", weight: 100 },
+                        { name: "лук", weight: 30 },
+                        { name: "масло растительное", weight: 15 }
+                    ],
+                    totalWeight: 295
+                },
+                {
+                    name: "Гречневая каша с мясом",
+                    ingredients: [
+                        { name: "гречка", weight: 150 },
+                        { name: "говядина", weight: 120 },
+                        { name: "лук", weight: 40 },
+                        { name: "морковь", weight: 30 }
+                    ],
+                    totalWeight: 340
+                }
+            ];
+            
+            const randomDish = dishes[Math.floor(Math.random() * dishes.length)];
+            return calculateNutrition(randomDish);
+        }
+
+        // Расчет питательной ценности
+        function calculateNutrition(dishData) {
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalFat = 0;
+            let totalCarbs = 0;
+
+            dishData.ingredients.forEach(ingredient => {
+                const ratio = ingredient.weight / 100;
+                const name = ingredient.name.toLowerCase();
+
+                let calories, protein, fat, carbs;
+
+                if (name.includes('мясо') || name.includes('куриц') || name.includes('говядин') || name.includes('рыб')) {
+                    calories = 250 * ratio;
+                    protein = 25 * ratio;
+                    fat = 15 * ratio;
+                    carbs = 0 * ratio;
+                } else if (name.includes('овощ') || name.includes('помидор') || name.includes('огурец') || name.includes('салат')) {
+                    calories = 25 * ratio;
+                    protein = 1 * ratio;
+                    fat = 0 * ratio;
+                    carbs = 5 * ratio;
+                } else if (name.includes('круп') || name.includes('рис') || name.includes('гречк') || name.includes('макарон')) {
+                    calories = 130 * ratio;
+                    protein = 4 * ratio;
+                    fat = 1 * ratio;
+                    carbs = 25 * ratio;
+                } else if (name.includes('бульон')) {
+                    calories = 15 * ratio;
+                    protein = 2 * ratio;
+                    fat = 1 * ratio;
+                    carbs = 1 * ratio;
+                } else if (name.includes('масло')) {
+                    calories = 900 * ratio;
+                    protein = 0 * ratio;
+                    fat = 100 * ratio;
+                    carbs = 0 * ratio;
+                } else {
+                    calories = 100 * ratio;
+                    protein = 5 * ratio;
+                    fat = 3 * ratio;
+                    carbs = 15 * ratio;
+                }
+
+                totalCalories += calories;
+                totalProtein += protein;
+                totalFat += fat;
+                totalCarbs += carbs;
+            });
+
+            const breadUnits = totalCarbs / 12;
+            const bje = (totalProtein + totalFat) / 12;
+
+            return {
+                dishName: dishData.name,
+                totalWeight: dishData.totalWeight,
+                calories: Math.round(totalCalories),
+                protein: Math.round(totalProtein * 10) / 10,
+                fat: Math.round(totalFat * 10) / 10,
+                carbs: Math.round(totalCarbs * 10) / 10,
+                breadUnits: Math.round(breadUnits * 10) / 10,
+                bje: Math.round(bje * 10) / 10,
+                glycemicIndex: "средний"
+            };
+        }
+
+        // Списание стоимости анализа
+        function deductAnalysisCost() {
+            if (currentUser.isAdmin) return;
+
+            const userBalances = loadData(DB_KEYS.USER_BALANCES);
+            const userFreeRequests = loadData(DB_KEYS.USER_FREE_REQUESTS);
+            
+            let freeRequests = userFreeRequests[currentUser.id] || 10;
+            let balance = userBalances[currentUser.id] || 0;
+
+            if (freeRequests > 0) {
+                freeRequests--;
+                userFreeRequests[currentUser.id] = freeRequests;
+                saveData(DB_KEYS.USER_FREE_REQUESTS, userFreeRequests);
+            } else {
+                balance--;
+                userBalances[currentUser.id] = balance;
+                saveData(DB_KEYS.USER_BALANCES, userBalances);
+            }
+
+            updateUserDisplay();
+        }
+
+        // Отображение результата анализа
+        function displayAnalysisResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            const nutritionGrid = document.getElementById('nutritionGrid');
+            const analysisResult = document.getElementById('analysisResult');
+            
+            // Сохраняем данные для возможного пересчета
+            currentAnalysisData = result;
+            
+            // Форматируем текст результата
+            resultContent.innerHTML = `
+                <h4>${result.dishName} (${result.totalWeight} г)</h4>
+                <p><strong>Суммарная пищевая ценность:</strong></p>
+            `;
+            
+            // Создаем сетку питательной ценности
+            nutritionGrid.innerHTML = `
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.calories}</div>
+                    <div class="nutrition-label">Ккал</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.protein}</div>
+                    <div class="nutrition-label">Белки (г)</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.fat}</div>
+                    <div class="nutrition-label">Жиры (г)</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.carbs}</div>
+                    <div class="nutrition-label">Углеводы (г)</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.breadUnits}</div>
+                    <div class="nutrition-label">ХЕ</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">${result.bje}</div>
+                    <div class="nutrition-label">БЖЕ</div>
+                </div>
+            `;
+            
+            // Добавляем дополнительную информацию
+            resultContent.innerHTML += `
+                <p><strong>Дополнительная информация:</strong></p>
+                <p>• Гликемический индекс: ${result.glycemicIndex}</p>
+                <p>• Белково-жировые единицы: ${result.bje} БЖЕ</p>
+                <p style="margin-top: 15px; font-style: italic;">Приятного аппетита!</p>
+            `;
+            
+            analysisResult.style.display = 'block';
+        }
+
+        // Показать поле для ввода веса
+        function showWeightInput() {
+            document.getElementById('weightInputSection').style.display = 'block';
+        }
+
+        // Пересчет с новым весом
+        function recalculateWeight() {
+            const weightInput = document.getElementById('weightInput');
+            const weight = parseInt(weightInput.value);
+            
+            if (!weight || weight < 1) {
+                showAlert('scannerAlert', 'Введите корректный вес', 'error');
+                return;
+            }
+
+            // Проверяем баланс для пересчета
+            if (!currentUser.isAdmin) {
+                const userBalances = loadData(DB_KEYS.USER_BALANCES);
+                const balance = userBalances[currentUser.id] || 0;
+                
+                if (balance < 1) {
+                    showAlert('scannerAlert', 
+                        'Для изменения веса необходимо пополнить баланс. Стоимость: 1 рубль.', 
+                        'error');
+                    return;
+                }
+                
+                // Списание 1 рубля
+                userBalances[currentUser.id] = balance - 1;
+                saveData(DB_KEYS.USER_BALANCES, userBalances);
+                updateUserDisplay();
+            }
+
+            // Пересчет данных
+            const ratio = weight / currentAnalysisData.totalWeight;
+            const recalculatedData = {
+                ...currentAnalysisData,
+                totalWeight: weight,
+                calories: Math.round(currentAnalysisData.calories * ratio),
+                protein: Math.round(currentAnalysisData.protein * ratio * 10) / 10,
+                fat: Math.round(currentAnalysisData.fat * ratio * 10) / 10,
+                carbs: Math.round(currentAnalysisData.carbs * ratio * 10) / 10,
+                breadUnits: Math.round(currentAnalysisData.breadUnits * ratio * 10) / 10,
+                bje: Math.round(currentAnalysisData.bje * ratio * 10) / 10
+            };
+
+            displayAnalysisResult(recalculatedData);
+            document.getElementById('weightInputSection').style.display = 'none';
+            showAlert('scannerAlert', 'Вес успешно изменен', 'success');
+        }
+
+        // Оплата через Robokassa
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('customAmount').value = amount;
+            
+            // Обновляем активные кнопки
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function processPayment() {
+            let amount = selectedAmount;
+            
+            if (!amount) {
+                amount = parseInt(document.getElementById('customAmount').value);
+            }
+            
+            if (!amount || amount < MIN_PAYMENT_AMOUNT) {
+                showAlert('paymentAlert', `Минимальная сумма пополнения: ${MIN_PAYMENT_AMOUNT} рублей`, 'error');
+                return;
+            }
+
+            // Генерация платежной ссылки Robokassa
+            const paymentUrl = generateRobokassaLink(amount, currentUser.id);
+            
+            if (paymentUrl) {
+                const paymentLink = document.getElementById('paymentLink');
+                paymentLink.href = paymentUrl;
+                paymentLink.textContent = `Оплатить ${amount} руб`;
+                document.getElementById('paymentResult').style.display = 'block';
+                showAlert('paymentAlert', 'Платеж создан успешно', 'success');
+            } else {
+                showAlert('paymentAlert', 'Ошибка при создании платежа', 'error');
+            }
+        }
+
+        // Генерация ссылки Robokassa (упрощенная версия)
+        function generateRobokassaLink(amount, userId) {
+            const paymentId = Date.now().toString();
+            const description = "Пополнение баланса Сканер XE";
+            
+            // В реальном приложении здесь будет генерация подписи
+            const mockUrl = `https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=${ROBOKASSA_LOGIN}&OutSum=${amount}&InvId=${paymentId}&Description=${encodeURIComponent(description)}&SignatureValue=mock&shp_userId=${userId}`;
+            
+            // Сохраняем платеж в ожидающие
+            const pendingPayments = loadData(DB_KEYS.PENDING_PAYMENTS);
+            pendingPayments[paymentId] = {
+                user_id: userId,
+                amount: amount,
+                timestamp: Date.now(),
+                description: description
+            };
+            saveData(DB_KEYS.PENDING_PAYMENTS, pendingPayments);
+            
+            return mockUrl;
+        }
+
+        // Проверка платежей (имитация)
+        function checkPayments() {
+            const pendingPayments = loadData(DB_KEYS.PENDING_PAYMENTS);
+            const userBalances = loadData(DB_KEYS.USER_BALANCES);
+            
+            let processedCount = 0;
+            let totalAmount = 0;
+            
+            // Имитация обработки платежей (в реальном приложении здесь будет запрос к API Robokassa)
+            Object.keys(pendingPayments).forEach(paymentId => {
+                const payment = pendingPayments[paymentId];
+                if (payment.user_id === currentUser.id) {
+                    // Имитируем успешную оплату для демонстрации
+                    if (Math.random() > 0.3) { // 70% шанс успешной оплаты для демо
+                        userBalances[currentUser.id] = (userBalances[currentUser.id] || 0) + payment.amount;
+                        delete pendingPayments[paymentId];
+                        processedCount++;
+                        totalAmount += payment.amount;
+                    }
+                }
+            });
+            
+            saveData(DB_KEYS.PENDING_PAYMENTS, pendingPayments);
+            saveData(DB_KEYS.USER_BALANCES, userBalances);
+            
+            if (processedCount > 0) {
+                updateUserDisplay();
+                showAlert('paymentAlert', 
+                    `Обработано платежей: ${processedCount}\nЗачислено на баланс: ${totalAmount} руб\nТекущий баланс: ${userBalances[currentUser.id]} руб`, 
+                    'success');
+            } else {
+                showAlert('paymentAlert', 
+                    'Платежи еще обрабатываются платежной системой. Пожалуйста, подождите несколько минут и проверьте снова.', 
+                    'error');
+            }
+        }
+
+        // Загрузка данных пользователя
+        function loadUserData() {
+            const userBalances = loadData(DB_KEYS.USER_BALANCES);
+            const userFreeRequests = loadData(DB_KEYS.USER_FREE_REQUESTS);
+            
+            const balance = userBalances[currentUser.id] || 0;
+            const freeRequests = userFreeRequests[currentUser.id] || 10;
+            
+            document.getElementById('userBalance').textContent = balance;
+            document.getElementById('freeRequests').textContent = freeRequests;
+        }
+
+        function updateUserDisplay() {
+            loadUserData();
+        }
+
+        // Админ-функции
+        function loadAdminStats() {
+            const userBalances = loadData(DB_KEYS.USER_BALANCES);
+            const pendingPayments = loadData(DB_KEYS.PENDING_PAYMENTS);
+            
+            const totalUsers = Object.keys(userBalances).length;
+            const totalBalance = Object.values(userBalances).reduce((sum, balance) => sum + balance, 0);
+            const pendingCount = Object.keys(pendingPayments).length;
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalBalance').textContent = Math.round(totalBalance);
+            document.getElementById('pendingPayments').textContent = pendingCount;
+        }
+
+        function updateMinAmount() {
+            // В демо-версии просто показываем сообщение
+            showAlert('paymentAlert', 'Функция доступна в полной версии системы', 'success');
+        }
+
+        // Вспомогательные функции
+        function showSection(sectionName) {
+            // Скрываем все секции
+            document.querySelectorAll('.scanner-section, .payment-section, .info-section, .admin-section')
+                .forEach(section => {
+                    section.style.display = 'none';
+                });
+            
+            // Показываем нужную секцию
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Скрываем все алерты
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.display = 'none';
+            });
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showAlert(alertId, message, type) {
+            const alert = document.getElementById(alertId);
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+        }
+
+        function hideAlert(alertId) {
+            document.getElementById(alertId).style.display = 'none';
+        }
+
+        function loadOfferText() {
+            // Упрощенный текст оферты для демо
+            const offerText = `
+                <h3>ПУБЛИЧНАЯ ОФЕРТА</h3>
+                <p><strong>Самозанятый Чумаков Дмитрий Евгеньевич</strong></p>
+                <p>ИНН: 132610382652</p>
+                <p><strong>Услуга:</strong> Анализ калорийности блюд по фотографии</p>
+                <p><strong>Стоимость:</strong> 1 запрос = 1 рубль</p>
+                <p><strong>Бесплатные запросы:</strong> 10 для новых пользователей</p>
+                <p>Контактный e-mail: it007.d@yandex.ru</p>
+            `;
+            document.getElementById('offerText').innerHTML = offerText;
+        }
+
+        // Инициализация значений по умолчанию
+        document.getElementById('customAmount').addEventListener('input', function() {
+            selectedAmount = parseInt(this.value) || 0;
+        });
+
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
