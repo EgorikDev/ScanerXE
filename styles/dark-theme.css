@@ -1,1 +1,99 @@
 
+**2. styles/dark-theme.css**
+```css
+[data-theme="dark"] {
+    color-scheme: dark;
+    
+    --primary: #818CF8;
+    --primary-dark: #6366F1;
+    --primary-light: #4F46E5;
+    --secondary: #34D399;
+    --accent: #FBBF24;
+    --danger: #F87171;
+    --warning: #FBBF24;
+    --info: #22D3EE;
+    
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-tertiary: #334155;
+    --bg-card: #1E293B;
+    --bg-overlay: rgba(30, 41, 59, 0.8);
+    
+    --text-primary: #F1F5F9;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --border-light: #334155;
+    --border-medium: #475569;
+    --border-dark: #64748B;
+}
+
+[data-theme="dark"] .app-header {
+    background: rgba(30, 41, 59, 0.8);
+    border-bottom-color: var(--border-light);
+}
+
+[data-theme="dark"] .auth-card {
+    background: var(--bg-card);
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .theme-btn {
+    background: var(--bg-tertiary);
+    border-color: var(--border-medium);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .main-tabs,
+[data-theme="dark"] .nutrition-card,
+[data-theme="dark"] .analysis-item,
+[data-theme="dark"] .payment-option {
+    background: var(--bg-card);
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .upload-zone {
+    background: var(--bg-secondary);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .form-input {
+    background: var(--bg-tertiary);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .chat-messages {
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .message-text {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .recommendations-card {
+    background: linear-gradient(135deg, #064E3B, #065F46);
+    border-left-color: var(--secondary);
+}
+
+[data-theme="dark"] .recommendations-card h4,
+[data-theme="dark"] .recommendations-card p {
+    color: #A7F3D0;
+}
+
+[data-theme="dark"] .history-filters,
+[data-theme="dark"] .auth-tabs {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .tab-nav {
+    background: var(--bg-tertiary);
+    border-bottom-color: var(--border-light);
+}
