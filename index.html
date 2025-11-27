@@ -1,500 +1,2188 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkanerXE - AI Анализатор Питания</title>
-    <link rel="stylesheet" href="styles/light-theme.css">
-    <link rel="stylesheet" href="styles/dark-theme.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>SkanerXE - AI анализатор еды</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --info: #4299e1;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --gray: #718096;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        body {
+            background: var(--gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 20px 30px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-text h1 {
+            font-size: 28px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .admin-badge {
+            background: var(--warning);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .main-content {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .auth-forms {
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        
+        .btn-info {
+            background: var(--info);
+        }
+        
+        .btn-info:hover {
+            background: #3182ce;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: var(--radius);
+            background: var(--light);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 22px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #ebf8ff 0%, #fff5f7 100%);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            border: 1px solid #bee3f8;
+        }
+        
+        .balance-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        
+        .free-requests {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: var(--radius);
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background: #f7fafc;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        .upload-area i {
+            font-size: 60px;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .upload-area small {
+            color: var(--gray);
+        }
+        
+        #image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            display: none;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-option {
+            padding: 20px 15px;
+            text-align: center;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: #ebf8ff;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+        
+        .result-area {
+            display: none;
+            margin-top: 20px;
+            padding: 25px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .result-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .nutrition-item {
+            padding: 20px 15px;
+            background: #f7fafc;
+            border-radius: var(--radius);
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .nutrition-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nutrition-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        
+        .nutrition-label {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+        
+        .recommendations {
+            background: #f0fff4;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .recommendations h4 {
+            color: var(--success);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .weight-control {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            gap: 0;
+        }
+        
+        .weight-control input {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            border-right: none;
+        }
+        
+        .weight-control button {
+            border-radius: 0 8px 8px 0;
+            white-space: nowrap;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .loader-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: #f7fafc;
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 5px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+            border-radius: 6px;
+            margin: 0 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab:hover {
+            background: #edf2f7;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            font-weight: bold;
+            color: var(--primary);
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+        
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .history-item {
+            padding: 18px;
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        
+        .history-item:hover {
+            background: #f7fafc;
+            transform: translateX(5px);
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .history-dish {
+            font-weight: bold;
+            margin: 8px 0;
+            font-size: 18px;
+        }
+        
+        .history-calories {
+            color: #2b6cb0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f7fafc;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+            color: #22543d;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            border-color: #feb2b2;
+            color: #742a2a;
+        }
+        
+        .alert-info {
+            background: #bee3f8;
+            border-color: #90cdf4;
+            color: #2a4365;
+        }
+        
+        .admin-panel {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+        }
+        
+        .user-item {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .user-item:hover {
+            background: #f7fafc;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-email {
+            font-weight: bold;
+        }
+        
+        .user-balance {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* Chat Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f7fafc;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.bot {
+            background: white;
+            color: var(--dark);
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e0;
+            border-radius: 24px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .chat-input button {
+            border-radius: 24px;
+            padding: 12px 20px;
+        }
+        
+        /* Improved responsive design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .user-info {
+                justify-content: center;
+            }
+            
+            .payment-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nutrition-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .weight-control {
+                flex-direction: column;
+            }
+            
+            .weight-control input {
+                border-radius: 8px;
+                margin-bottom: 10px;
+                border-right: 2px solid #cbd5e0;
+            }
+            
+            .weight-control button {
+                border-radius: 8px;
+                width: 100%;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                padding: 10px 5px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .payment-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .nutrition-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <div class="theme-toggle">
-        <button id="theme-switcher" class="theme-btn">
-            <i class="fas fa-moon"></i>
-        </button>
-    </div>
-
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loading-screen">
-        <div class="loader-content">
-            <div class="loader-logo">
-                <div class="logo-icon">SX</div>
-                <span>SkanerXE</span>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>SkanerXE</h1>
+                    <p>AI анализатор калорийности и состава блюд</p>
+                </div>
             </div>
-            <div class="loader-spinner"></div>
-            <p>Загрузка AI системы...</p>
-        </div>
-    </div>
-
-    <!-- Main App Container -->
-    <div class="app-container" id="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <nav class="nav-container">
-                <div class="nav-brand">
-                    <div class="logo">
-                        <div class="logo-icon">SX</div>
-                        <span class="logo-text">SkanerXE</span>
-                    </div>
+            <div class="user-info" id="user-info" style="display: none;">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div>
+                    <div id="user-email"></div>
+                    <span class="admin-badge" id="admin-badge" style="display: none;">ADMIN</span>
                 </div>
-                
-                <div class="nav-actions">
-                    <div class="balance-display">
-                        <i class="fas fa-wallet"></i>
-                        <span id="balance-amount">0 ₽</span>
-                    </div>
-                    <div class="user-menu">
-                        <div class="user-avatar" id="user-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-dropdown">
-                            <div class="user-info">
-                                <span id="user-email"></span>
-                                <small id="user-plan">Бесплатный</small>
-                            </div>
-                            <button class="dropdown-item" id="logout-btn">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Выйти
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+                <button class="btn btn-secondary" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
+            </div>
         </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Auth Section -->
-            <section class="auth-section" id="auth-section">
-                <div class="auth-container">
-                    <div class="auth-card">
-                        <div class="auth-header">
-                            <h1>Добро пожаловать в SkanerXE</h1>
-                            <p>AI-ассистент для анализа питания</p>
+        
+        <div class="main-content">
+            <!-- Формы авторизации -->
+            <div id="auth-section">
+                <div class="auth-forms">
+                    <div class="section fade-in">
+                        <h2><i class="fas fa-sign-in-alt"></i> Вход в систему</h2>
+                        <div class="form-group">
+                            <label for="login-email">Email:</label>
+                            <input type="email" id="login-email" placeholder="Ваш email">
                         </div>
-
-                        <div class="auth-tabs">
-                            <button class="auth-tab active" data-tab="login">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Вход
-                            </button>
-                            <button class="auth-tab" data-tab="register">
-                                <i class="fas fa-user-plus"></i>
-                                Регистрация
-                            </button>
+                        <div class="form-group">
+                            <label for="login-password">Пароль:</label>
+                            <input type="password" id="login-password" placeholder="Ваш пароль">
                         </div>
-
-                        <!-- Login Form -->
-                        <form class="auth-form active" id="login-form">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-envelope"></i>
-                                    Email
-                                </label>
-                                <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i>
-                                    Пароль
-                                </label>
-                                <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-lg btn-block" id="login-btn">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Войти в аккаунт
-                            </button>
-                        </form>
-
-                        <!-- Register Form -->
-                        <form class="auth-form" id="register-form">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-envelope"></i>
-                                    Email
-                                </label>
-                                <input type="email" class="form-input" id="register-email" placeholder="your@email.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i>
-                                    Пароль
-                                </label>
-                                <input type="password" class="form-input" id="register-password" placeholder="Минимум 6 символов" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i>
-                                    Подтвердите пароль
-                                </label>
-                                <input type="password" class="form-input" id="register-confirm" placeholder="Повторите пароль" required>
-                            </div>
-                            <button type="submit" class="btn btn-success btn-lg btn-block" id="register-btn">
-                                <i class="fas fa-user-plus"></i>
-                                Создать аккаунт
-                            </button>
-                        </form>
+                        <button class="btn btn-block" id="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                    </div>
+                    
+                    <div class="section fade-in">
+                        <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+                        <div class="form-group">
+                            <label for="register-email">Email:</label>
+                            <input type="email" id="register-email" placeholder="Ваш email">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Пароль:</label>
+                            <input type="password" id="register-password" placeholder="Придумайте пароль">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm">Подтвердите пароль:</label>
+                            <input type="password" id="register-confirm" placeholder="Повторите пароль">
+                        </div>
+                        <button class="btn btn-success btn-block" id="register-btn">
+                            <i class="fas fa-user-plus"></i> Зарегистрироваться
+                        </button>
                     </div>
                 </div>
-            </section>
-
-            <!-- App Section -->
-            <section class="app-section" id="app-section" style="display: none;">
-                <div class="container-fluid">
-                    <!-- Stats Dashboard -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="stat-balance">0 ₽</div>
-                                <div class="stat-label">Баланс</div>
-                            </div>
+            </div>
+            
+            <!-- Основной интерфейс -->
+            <div id="app-section" style="display: none;">
+                <div class="section">
+                    <div class="balance-info">
+                        <div>
+                            <div class="balance-amount" id="balance-amount">0 руб</div>
+                            <div class="free-requests" id="free-requests">Бесплатных анализов: 0/10</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="stat-free-requests">10</div>
-                                <div class="stat-label">Бесплатные анализы</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="stat-total-analyses">0</div>
-                                <div class="stat-label">Всего анализов</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="stat-calories-today">0</div>
-                                <div class="stat-label">Ккал сегодня</div>
-                            </div>
-                        </div>
+                        <button class="btn pulse" id="topup-btn">
+                            <i class="fas fa-wallet"></i> Пополнить
+                        </button>
                     </div>
-
-                    <!-- Main Tabs -->
-                    <div class="main-tabs">
-                        <div class="tab-nav">
-                            <button class="tab-btn active" data-tab="scanner">
-                                <i class="fas fa-camera"></i>
-                                Сканер
-                            </button>
-                            <button class="tab-btn" data-tab="chat">
-                                <i class="fas fa-comment-dots"></i>
-                                AI Чат
-                            </button>
-                            <button class="tab-btn" data-tab="payments">
-                                <i class="fas fa-credit-card"></i>
-                                Платежи
-                            </button>
-                            <button class="tab-btn" data-tab="history">
-                                <i class="fas fa-history"></i>
-                                История
-                            </button>
-                            <button class="tab-btn" data-tab="profile">
-                                <i class="fas fa-user"></i>
-                                Профиль
-                            </button>
+                    
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <div class="tab active" data-tab="analysis">
+                                <i class="fas fa-camera"></i> Анализ фото
+                            </div>
+                            <div class="tab" data-tab="chat">
+                                <i class="fas fa-comments"></i> Чат с AI
+                            </div>
+                            <div class="tab" data-tab="payments">
+                                <i class="fas fa-credit-card"></i> Платежи
+                            </div>
+                            <div class="tab" data-tab="history">
+                                <i class="fas fa-history"></i> История
+                            </div>
+                            <div class="tab" data-tab="info">
+                                <i class="fas fa-info-circle"></i> Информация
+                            </div>
+                            <div class="tab admin-only" data-tab="admin" style="display: none;">
+                                <i class="fas fa-cogs"></i> Админ-панель
+                            </div>
                         </div>
-
-                        <!-- Scanner Tab -->
-                        <div class="tab-content active" id="scanner-tab">
-                            <div class="scanner-container">
-                                <div class="scanner-header">
-                                    <h2>AI Анализ Питания</h2>
-                                    <p>Сфотографируйте блюдо для детального анализа состава и КБЖУ</p>
+                        
+                        <div class="tab-content active" id="analysis-tab">
+                            <h2><i class="fas fa-camera"></i> Анализ блюда по фото</h2>
+                            
+                            <div class="upload-area" id="upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Нажмите для загрузки фото или перетащите сюда</p>
+                                <small>Поддерживаемые форматы: JPG, PNG, WEBP (макс. 5MB)</small>
+                            </div>
+                            
+                            <input type="file" id="file-input" accept="image/*" style="display: none;">
+                            
+                            <img id="image-preview" alt="Предпросмотр">
+                            
+                            <div class="loader" id="analyze-loader">
+                                <div class="loader-spinner"></div>
+                                <p>Анализируем фото с помощью AI...</p>
+                            </div>
+                            
+                            <button class="btn btn-block" id="analyze-btn" style="display: none;">
+                                <i class="fas fa-search"></i> Проанализировать
+                            </button>
+                            
+                            <div class="result-area" id="result-area">
+                                <h3 class="result-title" id="result-title">
+                                    <i class="fas fa-chart-bar"></i> Результат анализа
+                                </h3>
+                                <div class="nutrition-grid" id="nutrition-grid">
+                                    <!-- Будет заполнено динамически -->
                                 </div>
-
-                                <div class="upload-section">
-                                    <div class="upload-zone" id="upload-zone">
-                                        <div class="upload-icon">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                        </div>
-                                        <h3>Загрузите фото блюда</h3>
-                                        <p>Перетащите изображение или нажмите для выбора</p>
-                                        <div class="upload-formats">
-                                            <span class="format-tag">JPG</span>
-                                            <span class="format-tag">PNG</span>
-                                            <span class="format-tag">WEBP</span>
-                                        </div>
-                                        <input type="file" id="file-input" accept="image/*" hidden>
-                                        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
-                                            <i class="fas fa-folder-open"></i>
-                                            Выбрать файл
-                                        </button>
-                                    </div>
-
-                                    <div class="image-preview" id="image-preview" style="display: none;">
-                                        <img id="preview-image" alt="Предпросмотр">
-                                        <button class="btn-remove" id="remove-image">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
+                                
+                                <div class="recommendations" id="recommendations">
+                                    <!-- Рекомендации по питанию -->
                                 </div>
-
-                                <div class="analyze-section">
-                                    <div class="loader" id="analyze-loader" style="display: none;">
-                                        <div class="loader-spinner"></div>
-                                        <div class="loader-text">
-                                            <h4>AI анализирует ваше блюдо...</h4>
-                                            <p>Определяем ингредиенты и питательную ценность</p>
-                                        </div>
-                                    </div>
-
-                                    <button class="btn btn-primary btn-lg btn-block" id="analyze-btn" style="display: none;">
-                                        <i class="fas fa-magic"></i>
-                                        Проанализировать (1 анализ = 1 ₽)
+                                
+                                <div class="weight-control">
+                                    <input type="number" id="weight-input" placeholder="Введите точный вес в граммах">
+                                    <button class="btn" id="recalculate-btn">
+                                        <i class="fas fa-calculator"></i> Пересчитать
                                     </button>
                                 </div>
-
-                                <!-- Results -->
-                                <div class="results-section" id="results-section" style="display: none;">
-                                    <div class="results-header">
-                                        <h3 id="result-title">Результат анализа</h3>
-                                        <div class="result-actions">
-                                            <button class="btn btn-outline" id="save-result">
-                                                <i class="fas fa-save"></i>
-                                                Сохранить
-                                            </button>
-                                            <button class="btn btn-outline" id="share-result">
-                                                <i class="fas fa-share"></i>
-                                                Поделиться
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="nutrition-grid" id="nutrition-grid">
-                                        <!-- Nutrition cards will be inserted here -->
-                                    </div>
-
-                                    <div class="recommendations-card" id="recommendations">
-                                        <!-- AI recommendations will be inserted here -->
-                                    </div>
-
-                                    <div class="weight-adjustment">
-                                        <h4>Корректировка веса</h4>
-                                        <div class="weight-control">
-                                            <input type="number" class="form-input" id="weight-input" placeholder="Точный вес в граммах">
-                                            <button class="btn btn-primary" id="recalculate-btn">
-                                                <i class="fas fa-calculator"></i>
-                                                Пересчитать (1 ₽)
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- AI Chat Tab -->
+                        
                         <div class="tab-content" id="chat-tab">
+                            <h2><i class="fas fa-comments"></i> Чат с AI-нутрициологом</h2>
+                            <p>Задавайте вопросы о питании, диетах и здоровом образе жизни</p>
+                            
                             <div class="chat-container">
-                                <div class="chat-header">
-                                    <h2>AI Нутрициолог</h2>
-                                    <p>Задавайте вопросы о питании, рецептах и здоровом образе жизни</p>
-                                </div>
-
                                 <div class="chat-messages" id="chat-messages">
-                                    <div class="message ai-message">
-                                        <div class="message-avatar">
-                                            <i class="fas fa-robot"></i>
-                                        </div>
-                                        <div class="message-content">
-                                            <div class="message-text">
-                                                Привет! Я ваш AI-нутрициолог. Можете спросить меня о:
-                                                • Калорийности продуктов
-                                                • Рецептах здорового питания  
-                                                • Советах по снижению веса
-                                                • Пищевой ценности блюд
-                                                Что вас интересует?
-                                            </div>
-                                            <div class="message-time">Только что</div>
-                                        </div>
+                                    <div class="message bot">
+                                        <strong>AI-нутрициолог:</strong> Привет! Я ваш помощник в вопросах питания. Спросите меня о калорийности продуктов, диетах или здоровом питании!
                                     </div>
                                 </div>
-
-                                <div class="chat-input-container">
-                                    <div class="chat-input">
-                                        <input type="text" id="chat-input" placeholder="Напишите ваш вопрос о питании...">
-                                        <button class="btn btn-primary" id="send-message">
-                                            <i class="fas fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                    <div class="chat-suggestions">
-                                        <button class="suggestion-btn" data-prompt="Сколько калорий в банане?">
-                                            Калории в банане
-                                        </button>
-                                        <button class="suggestion-btn" data-prompt="Рецепт полезного завтрака">
-                                            Рецепт завтрака
-                                        </button>
-                                        <button class="suggestion-btn" data-prompt="Как снизить потребление сахара?">
-                                            Снижение сахара
-                                        </button>
-                                    </div>
+                                <div class="chat-input">
+                                    <input type="text" id="chat-input" placeholder="Задайте вопрос о питании...">
+                                    <button class="btn" id="send-chat-btn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Payments Tab -->
+                        
                         <div class="tab-content" id="payments-tab">
-                            <div class="payments-container">
-                                <div class="payments-header">
-                                    <h2>Пополнение баланса</h2>
-                                    <p>Пополните счет для использования AI анализов</p>
+                            <h2><i class="fas fa-credit-card"></i> Пополнение баланса</h2>
+                            <p>Выберите сумму для пополнения (минимальная сумма: 50 руб):</p>
+                            
+                            <div class="payment-options">
+                                <div class="payment-option" data-amount="50">
+                                    <div>50 руб</div>
+                                    <small>+50 анализов</small>
                                 </div>
-
-                                <div class="balance-card">
-                                    <div class="balance-info">
-                                        <div class="balance-label">Текущий баланс</div>
-                                        <div class="balance-amount-large" id="balance-large">0 ₽</div>
-                                    </div>
-                                    <div class="balance-actions">
-                                        <button class="btn btn-outline" id="check-payments">
-                                            <i class="fas fa-sync"></i>
-                                            Проверить платежи
-                                        </button>
-                                    </div>
+                                <div class="payment-option" data-amount="100">
+                                    <div>100 руб</div>
+                                    <small>+100 анализов</small>
                                 </div>
-
-                                <div class="payment-options">
-                                    <h3>Выберите сумму</h3>
-                                    <div class="options-grid">
-                                        <div class="payment-option" data-amount="50">
-                                            <div class="option-amount">50 ₽</div>
-                                            <div class="option-bonus">+0 анализов</div>
-                                        </div>
-                                        <div class="payment-option" data-amount="100">
-                                            <div class="option-amount">100 ₽</div>
-                                            <div class="option-bonus">+5 анализов</div>
-                                        </div>
-                                        <div class="payment-option" data-amount="500">
-                                            <div class="option-amount">500 ₽</div>
-                                            <div class="option-bonus">+30 анализов</div>
-                                        </div>
-                                        <div class="payment-option" data-amount="1000">
-                                            <div class="option-amount">1000 ₽</div>
-                                            <div class="option-bonus">+70 анализов</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="custom-amount">
-                                        <label>Или введите свою сумму</label>
-                                        <div class="amount-input">
-                                            <input type="number" id="custom-amount" placeholder="100" min="50" max="10000">
-                                            <span class="currency">₽</span>
-                                        </div>
-                                    </div>
+                                <div class="payment-option" data-amount="500">
+                                    <div>500 руб</div>
+                                    <small>+500 анализов</small>
                                 </div>
-
-                                <button class="btn btn-primary btn-lg btn-block" id="payment-btn">
-                                    <i class="fas fa-credit-card"></i>
-                                    Перейти к оплате
+                                <div class="payment-option" data-amount="1000">
+                                    <div>1000 руб</div>
+                                    <small>+1000 анализов</small>
+                                </div>
+                            </div>
+                            
+                            <div style="margin: 20px 0;">
+                                <input type="number" id="custom-amount" placeholder="Или введите свою сумму" style="width: 100%; padding: 14px; border: 2px solid #cbd5e0; border-radius: 8px;">
+                            </div>
+                            
+                            <button class="btn btn-success btn-block" id="payment-btn">
+                                <i class="fas fa-lock"></i> Перейти к оплате
+                            </button>
+                            
+                            <div style="margin-top: 25px; padding: 20px; background: #f0fff4; border-radius: var(--radius); border: 1px solid #c6f6d5;">
+                                <h3><i class="fas fa-clock"></i> Ожидающие платежи</h3>
+                                <div id="pending-payments">
+                                    <p>Нет ожидающих платежей</p>
+                                </div>
+                                <button class="btn btn-secondary btn-block" id="check-payments-btn" style="margin-top: 15px;">
+                                    <i class="fas fa-sync-alt"></i> Проверить платежи
                                 </button>
-
-                                <div class="pending-payments" id="pending-payments">
-                                    <h4>Ожидающие платежи</h4>
-                                    <div class="payments-list" id="payments-list">
-                                        <!-- Pending payments will be listed here -->
-                                    </div>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- History Tab -->
+                        
                         <div class="tab-content" id="history-tab">
-                            <div class="history-container">
-                                <div class="history-header">
-                                    <h2>История анализов</h2>
-                                    <div class="history-stats">
-                                        <span id="total-analyses-count">0 анализов</span>
-                                        <span id="total-calories">0 ккал</span>
-                                    </div>
-                                </div>
-
-                                <div class="history-filters">
-                                    <button class="filter-btn active" data-filter="all">Все</button>
-                                    <button class="filter-btn" data-filter="today">Сегодня</button>
-                                    <button class="filter-btn" data-filter="week">Неделя</button>
-                                    <button class="filter-btn" data-filter="month">Месяц</button>
-                                </div>
-
-                                <div class="analyses-list" id="analyses-list">
-                                    <!-- Analysis history will be listed here -->
-                                </div>
+                            <h2><i class="fas fa-history"></i> История анализов</h2>
+                            <div id="history-list">
+                                <p>У вас пока нет анализов</p>
                             </div>
                         </div>
-
-                        <!-- Profile Tab -->
-                        <div class="tab-content" id="profile-tab">
-                            <div class="profile-container">
-                                <div class="profile-header">
-                                    <div class="profile-avatar">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="profile-info">
-                                        <h2 id="profile-email"></h2>
-                                        <p id="profile-plan">Бесплатный аккаунт</p>
-                                    </div>
+                        
+                        <div class="tab-content" id="info-tab">
+                            <h2><i class="fas fa-info-circle"></i> Информация</h2>
+                            <p>SkanerXE - это умный анализатор еды, который использует искусственный интеллект для определения состава и калорийности блюд по фотографии.</p>
+                            
+                            <h3 style="margin-top: 25px;"><i class="fas fa-cogs"></i> Как это работает?</h3>
+                            <ol style="margin-left: 25px; margin-top: 15px; line-height: 1.6;">
+                                <li>Загрузите фото блюда</li>
+                                <li>ИИ GPT-4 определит состав и вес ингредиентов</li>
+                                <li>Получите детальную информацию о пищевой ценности</li>
+                                <li>При необходимости уточните вес для пересчета</li>
+                            </ol>
+                            
+                            <h3 style="margin-top: 25px;"><i class="fas fa-tags"></i> Тарифы</h3>
+                            <ul style="margin-left: 25px; margin-top: 15px; line-height: 1.6;">
+                                <li>Новым пользователям - 10 бесплатных анализов</li>
+                                <li>После исчерпания бесплатных запросов - 1 рубль за анализ</li>
+                                <li>Изменение веса блюда - 1 рубль</li>
+                                <li>Консультация с AI-нутрициологом - бесплатно</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-content admin-panel" id="admin-tab">
+                            <h2><i class="fas fa-cogs"></i> Админ-панель</h2>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="stat-users">0</div>
+                                    <div class="stat-label">Всего пользователей</div>
                                 </div>
-
-                                <div class="profile-stats">
-                                    <div class="profile-stat">
-                                        <div class="stat-number" id="profile-analyses">0</div>
-                                        <div class="stat-label">Всего анализов</div>
-                                    </div>
-                                    <div class="profile-stat">
-                                        <div class="stat-number" id="profile-days">1</div>
-                                        <div class="stat-label">Дней с нами</div>
-                                    </div>
-                                    <div class="profile-stat">
-                                        <div class="stat-number" id="profile-saved">0</div>
-                                        <div class="stat-label">₽ сэкономлено</div>
-                                    </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="stat-balance">0 руб</div>
+                                    <div class="stat-label">Общий баланс</div>
                                 </div>
-
-                                <div class="profile-settings">
-                                    <h3>Настройки</h3>
-                                    <div class="setting-item">
-                                        <label>Уведомления</label>
-                                        <label class="switch">
-                                            <input type="checkbox" checked>
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <label>Темная тема</label>
-                                        <label class="switch">
-                                            <input type="checkbox" id="dark-mode-toggle">
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="stat-analyses">0</div>
+                                    <div class="stat-label">Всего анализов</div>
                                 </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="stat-payments">0</div>
+                                    <div class="stat-label">Ожидающих платежей</div>
+                                </div>
+                            </div>
+                            
+                            <div class="section">
+                                <h3><i class="fas fa-users"></i> Управление пользователями</h3>
+                                <div class="users-list" id="users-list">
+                                    <p>Загрузка пользователей...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="section">
+                                <h3><i class="fas fa-sliders-h"></i> Настройки системы</h3>
+                                <div class="form-group">
+                                    <label for="min-payment">Минимальная сумма пополнения (руб):</label>
+                                    <input type="number" id="min-payment" value="50">
+                                </div>
+                                <button class="btn" id="save-settings-btn">
+                                    <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Самозанятый Чумаков Дмитрий Евгеньевич | ИНН: 132610382652 | © 2024 SkanerXE. Все права защищены.</p>
+        </footer>
     </div>
 
-    <!-- Notifications -->
-    <div class="notifications-container" id="notifications"></div>
+    <script>
+        // База данных в localStorage с улучшенной структурой
+        class Database {
+            constructor() {
+                this.users = JSON.parse(localStorage.getItem('skanerxe_users')) || {};
+                this.analyses = JSON.parse(localStorage.getItem('skanerxe_analyses')) || {};
+                this.payments = JSON.parse(localStorage.getItem('skanerxe_payments')) || {};
+                this.chatHistory = JSON.parse(localStorage.getItem('skanerxe_chat')) || {};
+                this.settings = JSON.parse(localStorage.getItem('skanerxe_settings')) || {
+                    min_payment: 50,
+                    price_per_analysis: 1
+                };
+                
+                // Создаем администратора по умолчанию
+                if (!this.users['admin@skanerxe.ru']) {
+                    this.users['admin@skanerxe.ru'] = {
+                        password: this.hashPassword('admin123'),
+                        balance: 1000,
+                        free_requests: 999,
+                        is_admin: true,
+                        created_at: new Date().toISOString(),
+                        last_login: new Date().toISOString()
+                    };
+                    this.saveUsers();
+                }
+            }
+            
+            saveUsers() {
+                localStorage.setItem('skanerxe_users', JSON.stringify(this.users));
+            }
+            
+            saveAnalyses() {
+                localStorage.setItem('skanerxe_analyses', JSON.stringify(this.analyses));
+            }
+            
+            savePayments() {
+                localStorage.setItem('skanerxe_payments', JSON.stringify(this.payments));
+            }
+            
+            saveChat() {
+                localStorage.setItem('skanerxe_chat', JSON.stringify(this.chatHistory));
+            }
+            
+            saveSettings() {
+                localStorage.setItem('skanerxe_settings', JSON.stringify(this.settings));
+            }
+            
+            hashPassword(password) {
+                // Улучшенная хеш-функция для демонстрации
+                let hash = 0;
+                for (let i = 0; i < password.length; i++) {
+                    const char = password.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return hash.toString(36);
+            }
+            
+            registerUser(email, password) {
+                if (this.users[email]) {
+                    return { success: false, error: 'Пользователь с таким email уже существует' };
+                }
+                
+                if (password.length < 6) {
+                    return { success: false, error: 'Пароль должен содержать минимум 6 символов' };
+                }
+                
+                this.users[email] = {
+                    password: this.hashPassword(password),
+                    balance: 0,
+                    free_requests: 10,
+                    is_admin: false,
+                    created_at: new Date().toISOString(),
+                    last_login: new Date().toISOString()
+                };
+                
+                this.saveUsers();
+                return { success: true };
+            }
+            
+            loginUser(email, password) {
+                const user = this.users[email];
+                if (!user) {
+                    return { success: false, error: 'Пользователь не найден' };
+                }
+                
+                if (user.password !== this.hashPassword(password)) {
+                    return { success: false, error: 'Неверный пароль' };
+                }
+                
+                // Обновляем время последнего входа
+                user.last_login = new Date().toISOString();
+                this.saveUsers();
+                
+                return { 
+                    success: true, 
+                    user: {
+                        email: email,
+                        balance: user.balance,
+                        free_requests: user.free_requests,
+                        is_admin: user.is_admin
+                    }
+                };
+            }
+            
+            addAnalysis(email, analysisData) {
+                const analysisId = 'analysis_' + Date.now();
+                this.analyses[analysisId] = {
+                    ...analysisData,
+                    user_email: email,
+                    created_at: new Date().toISOString()
+                };
+                this.saveAnalyses();
+                return analysisId;
+            }
+            
+            getUserAnalyses(email) {
+                return Object.values(this.analyses)
+                    .filter(analysis => analysis.user_email === email)
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+            
+            updateUserBalance(email, amount) {
+                if (this.users[email]) {
+                    this.users[email].balance += amount;
+                    this.saveUsers();
+                    return true;
+                }
+                return false;
+            }
+            
+            useFreeRequest(email) {
+                if (this.users[email] && this.users[email].free_requests > 0) {
+                    this.users[email].free_requests--;
+                    this.saveUsers();
+                    return true;
+                }
+                return false;
+            }
+            
+            createPayment(email, amount) {
+                const paymentId = 'pay_' + Date.now();
+                this.payments[paymentId] = {
+                    user_email: email,
+                    amount: amount,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                };
+                this.savePayments();
+                return paymentId;
+            }
+            
+            completePayment(paymentId) {
+                if (this.payments[paymentId]) {
+                    this.payments[paymentId].status = 'completed';
+                    this.payments[paymentId].completed_at = new Date().toISOString();
+                    
+                    const payment = this.payments[paymentId];
+                    this.updateUserBalance(payment.user_email, payment.amount);
+                    
+                    this.savePayments();
+                    return true;
+                }
+                return false;
+            }
+            
+            getPendingPayments(email) {
+                return Object.values(this.payments)
+                    .filter(payment => payment.user_email === email && payment.status === 'pending');
+            }
+            
+            getAllUsers() {
+                return Object.entries(this.users).map(([email, data]) => ({
+                    email,
+                    ...data
+                }));
+            }
+            
+            getStats() {
+                const users = this.getAllUsers();
+                return {
+                    total_users: users.length,
+                    total_balance: users.reduce((sum, user) => sum + user.balance, 0),
+                    total_analyses: Object.keys(this.analyses).length,
+                    pending_payments: Object.values(this.payments).filter(p => p.status === 'pending').length
+                };
+            }
+            
+            // Методы для работы с чатом
+            addChatMessage(email, message, isUser = true) {
+                if (!this.chatHistory[email]) {
+                    this.chatHistory[email] = [];
+                }
+                
+                this.chatHistory[email].push({
+                    message: message,
+                    is_user: isUser,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Ограничиваем историю до 50 сообщений
+                if (this.chatHistory[email].length > 50) {
+                    this.chatHistory[email] = this.chatHistory[email].slice(-50);
+                }
+                
+                this.saveChat();
+            }
+            
+            getChatHistory(email) {
+                return this.chatHistory[email] || [];
+            }
+            
+            clearChatHistory(email) {
+                if (this.chatHistory[email]) {
+                    delete this.chatHistory[email];
+                    this.saveChat();
+                }
+            }
+        }
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
-    <script src="scripts/database.js"></script>
-    <script src="scripts/ai-chat.js"></script>
-    <script src="scripts/app.js"></script>
+        // Класс для работы с Robokassa (улучшенная версия)
+        class RobokassaPayment {
+            constructor() {
+                this.login = "SkanerXEbot";
+                this.password1 = "c7zMQKpaDT979pB3WhUO";
+                this.password2 = "gvTgn6Bh5T6VUhu8RG6t";
+                this.isTestMode = false; // В реальном приложении установить в false
+            }
+            
+            generateSignature(amount, paymentId, userId, password) {
+                const signatureString = `${this.login}:${amount}:${paymentId}:${password}:shp_userId=${userId}`;
+                return this.md5(signatureString).toLowerCase();
+            }
+            
+            generatePaymentLink(amount, paymentId, userId, description = "Пополнение баланса SkanerXE") {
+                const crc = this.generateSignature(amount, paymentId, userId, this.password1);
+                
+                let baseUrl = "https://auth.robokassa.ru/Merchant/Index.aspx?";
+                if (this.isTestMode) {
+                    baseUrl += "IsTest=1&";
+                }
+                
+                return baseUrl +
+                       `MerchantLogin=${this.login}&` +
+                       `OutSum=${amount}&` +
+                       `InvId=${paymentId}&` +
+                       `Description=${encodeURIComponent(description)}&` +
+                       `SignatureValue=${crc}&` +
+                       `shp_userId=${userId}`;
+            }
+            
+            md5(input) {
+                // Улучшенная реализация MD5 для демонстрации
+                let hash = 0;
+                if (input.length === 0) return hash.toString(16);
+                for (let i = 0; i < input.length; i++) {
+                    const char = input.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(16);
+            }
+            
+            verifyWebhookSignature(outSum, invId, signature, userId) {
+                const checkString = `${this.login}:${outSum}:${invId}:${this.password2}:shp_userId=${userId}`;
+                const checkSignature = this.md5(checkString).toUpperCase();
+                return signature.toUpperCase() === checkSignature;
+            }
+        }
+
+        // Класс AI-нутрициолога для чата
+        class NutritionAI {
+            constructor() {
+                this.responses = {
+                    greeting: [
+                        "Привет! Я ваш AI-нутрициолог. Готов ответить на вопросы о питании и здоровом образе жизни!",
+                        "Здравствуйте! Задавайте вопросы о питании, и я постараюсь помочь.",
+                        "Приветствую! Я здесь, чтобы помочь с вопросами о диетах и питании."
+                    ],
+                    calories: [
+                        "Калорийность зависит от многих факторов: состава продуктов, способа приготовления и размера порции.",
+                        "Для расчета калорийности важно учитывать БЖУ (белки, жиры, углеводы) продуктов.",
+                        "Средняя суточная норма калорий для взрослого человека: 2000-2500 ккал для женщин, 2500-3000 для мужчин."
+                    ],
+                    diet: [
+                        "Сбалансированная диета должна включать белки, сложные углеводы, полезные жиры, витамины и минералы.",
+                        "Рекомендую употреблять больше овощей, цельнозерновых продуктов и нежирного белка.",
+                        "Важно соблюдать питьевой режим - не менее 1.5-2 литров воды в день."
+                    ],
+                    weight_loss: [
+                        "Для снижения веса создайте дефицит калорий в 300-500 ккал от вашей нормы.",
+                        "Сочетайте правильное питание с физической активностью для лучших результатов.",
+                        "Избегайте резких ограничений - это может замедлить метаболизм."
+                    ],
+                    proteins: [
+                        "Белки необходимы для строительства и восстановления тканей организма.",
+                        "Источники белка: мясо, рыба, яйца, молочные продукты, бобовые, орехи.",
+                        "Рекомендуемая норма белка: 1-1.5 г на кг веса в день."
+                    ],
+                    default: [
+                        "Интересный вопрос! Рекомендую проконсультироваться с профессиональным диетологом для точного ответа.",
+                        "Это хороший вопрос о питании. Для более точного ответа нужна дополнительная информация.",
+                        "Спасибо за вопрос! Я AI-помощник, и мои рекомендации носят ознакомительный характер."
+                    ]
+                };
+            }
+            
+            getResponse(message) {
+                const lowerMessage = message.toLowerCase();
+                
+                if (lowerMessage.includes('привет') || lowerMessage.includes('здравств') || lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
+                    return this.getRandomResponse('greeting');
+                }
+                
+                if (lowerMessage.includes('калори') || lowerMessage.includes('calor')) {
+                    return this.getRandomResponse('calories');
+                }
+                
+                if (lowerMessage.includes('диет') || lowerMessage.includes('diet') || lowerMessage.includes('питани')) {
+                    return this.getRandomResponse('diet');
+                }
+                
+                if (lowerMessage.includes('похуд') || lowerMessage.includes('вес') || lowerMessage.includes('weight')) {
+                    return this.getRandomResponse('weight_loss');
+                }
+                
+                if (lowerMessage.includes('белк') || lowerMessage.includes('protein')) {
+                    return this.getRandomResponse('proteins');
+                }
+                
+                return this.getRandomResponse('default');
+            }
+            
+            getRandomResponse(type) {
+                const responses = this.responses[type] || this.responses.default;
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+        }
+
+        // Основной класс приложения
+        class SkanerXEApp {
+            constructor() {
+                this.db = new Database();
+                this.robokassa = new RobokassaPayment();
+                this.nutritionAI = new NutritionAI();
+                this.currentUser = null;
+                this.currentAnalysisId = null;
+                this.selectedPaymentAmount = 50;
+                
+                this.init();
+            }
+            
+            init() {
+                this.checkAuth();
+                this.setupEventListeners();
+                this.startPaymentChecker();
+                this.loadChatHistory();
+            }
+            
+            checkAuth() {
+                const savedUser = localStorage.getItem('current_user');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.showApp();
+                } else {
+                    this.showAuth();
+                }
+            }
+            
+            showAuth() {
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('app-section').style.display = 'none';
+                document.getElementById('user-info').style.display = 'none';
+            }
+            
+            showApp() {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('app-section').style.display = 'block';
+                document.getElementById('user-info').style.display = 'flex';
+                
+                document.getElementById('user-email').textContent = this.currentUser.email;
+                document.getElementById('user-avatar').textContent = this.currentUser.email.charAt(0).toUpperCase();
+                
+                if (this.currentUser.is_admin) {
+                    document.getElementById('admin-badge').style.display = 'inline-block';
+                    document.querySelectorAll('.admin-only').forEach(el => {
+                        el.style.display = 'flex';
+                    });
+                }
+                
+                this.updateUI();
+                this.loadUserAnalyses();
+                if (this.currentUser.is_admin) {
+                    this.loadAdminData();
+                }
+            }
+            
+            setupEventListeners() {
+                // Авторизация
+                document.getElementById('login-btn').addEventListener('click', () => this.login());
+                document.getElementById('register-btn').addEventListener('click', () => this.register());
+                document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+                
+                // Формы
+                document.getElementById('login-password').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.login();
+                });
+                document.getElementById('register-confirm').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.register();
+                });
+                
+                // Вкладки
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+                        
+                        // При переключении на чат, прокручиваем вниз
+                        if (tab.dataset.tab === 'chat') {
+                            setTimeout(() => {
+                                this.scrollChatToBottom();
+                            }, 100);
+                        }
+                    });
+                });
+                
+                // Загрузка фото
+                const uploadArea = document.getElementById('upload-area');
+                const fileInput = document.getElementById('file-input');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = 'var(--primary)';
+                    uploadArea.style.background = '#f0f4ff';
+                });
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.style.borderColor = '#cbd5e0';
+                    uploadArea.style.background = '';
+                });
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#cbd5e0';
+                    uploadArea.style.background = '';
+                    
+                    if (e.dataTransfer.files.length) {
+                        this.handleImageFile(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                        this.handleImageFile(e.target.files[0]);
+                    }
+                });
+                
+                // Анализ фото
+                document.getElementById('analyze-btn').addEventListener('click', () => this.analyzePhoto());
+                
+                // Чат
+                document.getElementById('send-chat-btn').addEventListener('click', () => this.sendChatMessage());
+                document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendChatMessage();
+                });
+                
+                // Платежи
+                document.querySelectorAll('.payment-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                        option.classList.add('selected');
+                        this.selectedPaymentAmount = parseInt(option.dataset.amount);
+                        document.getElementById('custom-amount').value = '';
+                    });
+                });
+                
+                document.getElementById('custom-amount').addEventListener('input', (e) => {
+                    if (e.target.value) {
+                        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                        this.selectedPaymentAmount = parseInt(e.target.value) || 0;
+                    }
+                });
+                
+                document.getElementById('payment-btn').addEventListener('click', () => this.processPayment());
+                document.getElementById('topup-btn').addEventListener('click', () => {
+                    document.querySelector('.tab[data-tab="payments"]').click();
+                });
+                document.getElementById('check-payments-btn').addEventListener('click', () => this.checkPendingPayments());
+                
+                // Пересчет
+                document.getElementById('recalculate-btn').addEventListener('click', () => this.recalculateWithNewWeight());
+                
+                // Админ-панель
+                document.getElementById('save-settings-btn').addEventListener('click', () => this.saveSettings());
+            }
+            
+            // Авторизация
+            login() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    this.showAlert('Заполните все поля', 'error');
+                    return;
+                }
+                
+                const result = this.db.loginUser(email, password);
+                if (result.success) {
+                    this.currentUser = result.user;
+                    localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                    this.showApp();
+                    this.showAlert('Успешный вход!', 'success');
+                } else {
+                    this.showAlert(result.error, 'error');
+                }
+            }
+            
+            register() {
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirm = document.getElementById('register-confirm').value;
+                
+                if (!email || !password || !confirm) {
+                    this.showAlert('Заполните все поля', 'error');
+                    return;
+                }
+                
+                if (password !== confirm) {
+                    this.showAlert('Пароли не совпадают', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    this.showAlert('Пароль должен содержать минимум 6 символов', 'error');
+                    return;
+                }
+                
+                const result = this.db.registerUser(email, password);
+                if (result.success) {
+                    this.showAlert('Регистрация успешна! Теперь войдите в систему', 'success');
+                    document.getElementById('register-email').value = '';
+                    document.getElementById('register-password').value = '';
+                    document.getElementById('register-confirm').value = '';
+                } else {
+                    this.showAlert(result.error, 'error');
+                }
+            }
+            
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('current_user');
+                this.showAuth();
+            }
+            
+            // Работа с фото
+            handleImageFile(file) {
+                if (!file.type.match('image.*')) {
+                    this.showAlert('Пожалуйста, выберите файл изображения', 'error');
+                    return;
+                }
+                
+                // Проверка размера файла (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    this.showAlert('Размер файла не должен превышать 5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('image-preview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('analyze-btn').style.display = 'flex';
+                    this.currentImageData = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            async analyzePhoto() {
+                if (!this.currentImageData) {
+                    this.showAlert('Пожалуйста, загрузите фото', 'error');
+                    return;
+                }
+                
+                // Проверка баланса
+                const price = this.db.settings.price_per_analysis;
+                if (this.currentUser.free_requests <= 0 && this.currentUser.balance < price) {
+                    this.showAlert(`Недостаточно средств. Нужно ${price} руб. Пожалуйста, пополните баланс.`, 'error');
+                    document.querySelector('.tab[data-tab="payments"]').click();
+                    return;
+                }
+                
+                // Показать загрузку
+                document.getElementById('analyze-loader').style.display = 'block';
+                document.getElementById('analyze-btn').disabled = true;
+                
+                try {
+                    // Эмуляция анализа AI с улучшенными результатами
+                    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
+                    
+                    const analysisResult = this.generateAnalysisResult();
+                    const analysisId = this.db.addAnalysis(this.currentUser.email, analysisResult);
+                    this.currentAnalysisId = analysisId;
+                    
+                    // Списание средств
+                    if (this.currentUser.free_requests > 0) {
+                        this.db.useFreeRequest(this.currentUser.email);
+                    } else {
+                        this.db.updateUserBalance(this.currentUser.email, -price);
+                    }
+                    
+                    // Обновляем данные пользователя
+                    this.currentUser = {
+                        ...this.currentUser,
+                        balance: this.db.users[this.currentUser.email].balance,
+                        free_requests: this.db.users[this.currentUser.email].free_requests
+                    };
+                    localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                    
+                    this.displayAnalysisResult(analysisResult);
+                    this.showAlert('Анализ завершен успешно!', 'success');
+                    
+                } catch (error) {
+                    console.error('Ошибка анализа:', error);
+                    this.showAlert('Ошибка при анализе фото', 'error');
+                } finally {
+                    document.getElementById('analyze-loader').style.display = 'none';
+                    document.getElementById('analyze-btn').disabled = false;
+                }
+            }
+            
+            generateAnalysisResult() {
+                const dishes = [
+                    { name: 'Салат овощной с курицей', type: 'meat', health: 'healthy', baseCalories: 120 },
+                    { name: 'Куриный суп с лапшой', type: 'meat', health: 'balanced', baseCalories: 80 },
+                    { name: 'Паста карбонара', type: 'meat', health: 'high_calorie', baseCalories: 350 },
+                    { name: 'Гречневая каша с мясом', type: 'meat', health: 'balanced', baseCalories: 150 },
+                    { name: 'Омлет с овощами', type: 'vegetarian', health: 'healthy', baseCalories: 180 },
+                    { name: 'Плов с бараниной', type: 'meat', health: 'high_calorie', baseCalories: 250 },
+                    { name: 'Борщ со сметаной', type: 'meat', health: 'balanced', baseCalories: 100 },
+                    { name: 'Пицца Маргарита', type: 'vegetarian', health: 'high_calorie', baseCalories: 280 },
+                    { name: 'Стейк из говядины', type: 'meat', health: 'protein_rich', baseCalories: 320 },
+                    { name: 'Салат Цезарь', type: 'meat', health: 'balanced', baseCalories: 200 },
+                    { name: 'Суп-пюре из брокколи', type: 'vegetarian', health: 'healthy', baseCalories: 90 },
+                    { name: 'Рыба на гриле', type: 'meat', health: 'healthy', baseCalories: 140 }
+                ];
+                
+                const dish = dishes[Math.floor(Math.random() * dishes.length)];
+                const weight = 200 + Math.floor(Math.random() * 400);
+                const calories = Math.round(dish.baseCalories * (weight / 100));
+                const protein = Math.round((5 + Math.random() * 30) * (weight / 100));
+                const fat = Math.round((3 + Math.random() * 20) * (weight / 100));
+                const carbs = Math.round((10 + Math.random() * 60) * (weight / 100));
+                const breadUnits = Math.round((carbs / 12) * 10) / 10;
+                
+                return {
+                    dish_name: dish.name,
+                    dish_type: dish.type,
+                    health_level: dish.health,
+                    weight: weight,
+                    calories: calories,
+                    protein: protein,
+                    fat: fat,
+                    carbs: carbs,
+                    bread_units: breadUnits,
+                    ingredients: this.generateIngredients(dish.name)
+                };
+            }
+            
+            generateIngredients(dish) {
+                const ingredientsMap = {
+                    'Салат овощной с курицей': ['куриное филе: 150г', 'помидоры: 100г', 'огурцы: 80г', 'листья салата: 50г', 'оливковое масло: 15г'],
+                    'Куриный суп с лапшой': ['куриный бульон: 300г', 'курица: 100г', 'лапша: 50г', 'морковь: 30г', 'лук: 20г', 'зелень: 10г'],
+                    'Паста карбонара': ['паста: 200г', 'бекон: 80г', 'сливки: 50г', 'сыр пармезан: 30г', 'яйцо: 50г', 'чеснок: 5г'],
+                    'Гречневая каша с мясом': ['гречка: 150г', 'говядина: 100г', 'лук: 50г', 'морковь: 50г', 'масло: 20г'],
+                    'Омлет с овощами': ['яйца: 120г', 'помидоры: 80г', 'перец: 60г', 'лук: 30г', 'масло: 15г', 'зелень: 10г'],
+                    'Плов с бараниной': ['рис: 150г', 'баранина: 120г', 'морковь: 80г', 'лук: 50г', 'масло: 25г', 'специи: 5г'],
+                    'Борщ со сметаной': ['бульон: 300г', 'свекла: 100г', 'картофель: 80г', 'капуста: 70г', 'мясо: 60г', 'сметана: 30г'],
+                    'Пицца Маргарита': ['тесто: 200г', 'сыр моцарелла: 120г', 'томатный соус: 80г', 'помидоры: 60г', 'базилик: 10г'],
+                    'Стейк из говядины': ['говядина: 250г', 'специи: 5г', 'масло: 15г', 'розмарин: 3г'],
+                    'Салат Цезарь': ['куриное филе: 150г', 'листья салата: 100г', 'сухарики: 30г', 'сыр пармезан: 25г', 'соус цезарь: 40г'],
+                    'Суп-пюре из брокколи': ['брокколи: 200г', 'картофель: 100г', 'сливки: 50г', 'лук: 30г', 'бульон: 250г'],
+                    'Рыба на гриле': ['филе рыбы: 200г', 'лимон: 30г', 'специи: 5г', 'оливковое масло: 15г', 'зелень: 10г']
+                };
+                
+                return ingredientsMap[dish] || ['основной компонент: 200г', 'дополнительные ингредиенты: 100г'];
+            }
+            
+            generateRecommendations(analysis) {
+                const recommendations = {
+                    healthy: [
+                        "Отличный выбор! Это блюдо хорошо сбалансировано и содержит много питательных веществ.",
+                        "Идеально для здорового питания. Содержит много витаминов и минералов.",
+                        "Прекрасный вариант для поддержания формы. Блюдо богато клетчаткой и белком."
+                    ],
+                    balanced: [
+                        "Сбалансированное блюдо, подходит для ежедневного рациона.",
+                        "Хорошее соотношение белков, жиров и углеводов. Можно употреблять регулярно.",
+                        "Питательное блюдо с оптимальным балансом нутриентов."
+                    ],
+                    high_calorie: [
+                        "Высококалорийное блюдо, рекомендуется умеренное потребление.",
+                        "Богато энергией, идеально для активного дня или после тренировки.",
+                        "Содержит много калорий, учитывайте при планировании дневного рациона."
+                    ],
+                    protein_rich: [
+                        "Богато белком, отлично для восстановления мышц.",
+                        "Идеально после физических нагрузок для восстановления.",
+                        "Высокобелковое блюдо способствует насыщению и поддержанию мышечной массы."
+                    ]
+                };
+                
+                const healthTips = {
+                    vegetarian: "Вегетарианское блюдо богато клетчаткой, витаминами и антиоксидантами.",
+                    meat: "Мясное блюдо обеспечивает полноценным белком и железом.",
+                    balanced: "Сбалансированный состав питательных веществ обеспечивает организм энергией."
+                };
+                
+                const dishRecs = recommendations[analysis.health_level] || recommendations.balanced;
+                const randomRec = dishRecs[Math.floor(Math.random() * dishRecs.length)];
+                const healthTip = healthTips[analysis.dish_type] || "Содержит разнообразные питательные вещества.";
+                
+                return `
+                    <h4><i class="fas fa-lightbulb"></i> Рекомендации по питанию</h4>
+                    <p><strong>${randomRec}</strong></p>
+                    <p>${healthTip}</p>
+                    <p><strong>Совет:</strong> ${this.getNutritionTip(analysis)}</p>
+                `;
+            }
+            
+            getNutritionTip(analysis) {
+                if (analysis.calories > 500) {
+                    return "Это блюдо достаточно калорийное, учитывайте его в своем дневном рационе. Рекомендуется сочетать с легкими овощами.";
+                } else if (analysis.protein > 25) {
+                    return "Богатый белком прием пищи, отлично для поддержания и восстановления мышечной массы. Идеально после тренировки.";
+                } else if (analysis.carbs > 50) {
+                    return "Высокое содержание углеводов обеспечит энергией на несколько часов. Подходит для первой половины дня.";
+                } else if (analysis.fat > 20) {
+                    return "Содержит значительное количество жиров. Обратите внимание на тип жиров - предпочтительны ненасыщенные.";
+                } else {
+                    return "Легкое и сбалансированное блюдо, подходит для любого приема пищи. Отличный выбор для здорового питания.";
+                }
+            }
+            
+            displayAnalysisResult(data) {
+                const resultArea = document.getElementById('result-area');
+                const nutritionGrid = document.getElementById('nutrition-grid');
+                
+                nutritionGrid.innerHTML = `
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.calories}</div>
+                        <div class="nutrition-label">ккал</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.protein}g</div>
+                        <div class="nutrition-label">белки</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.fat}g</div>
+                        <div class="nutrition-label">жиры</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.carbs}g</div>
+                        <div class="nutrition-label">углеводы</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.bread_units}</div>
+                        <div class="nutrition-label">хлебные единицы</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${data.weight}g</div>
+                        <div class="nutrition-label">вес</div>
+                    </div>
+                `;
+                
+                document.getElementById('result-title').textContent = `Блюдо: ${data.dish_name}`;
+                document.getElementById('weight-input').value = data.weight;
+                document.getElementById('recommendations').innerHTML = this.generateRecommendations(data);
+                
+                resultArea.style.display = 'block';
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+                
+                this.loadUserAnalyses();
+            }
+            
+            recalculateWithNewWeight() {
+                const weightInput = document.getElementById('weight-input');
+                const weight = parseInt(weightInput.value);
+                
+                if (!weight || weight <= 0) {
+                    this.showAlert('Пожалуйста, введите корректный вес', 'error');
+                    return;
+                }
+                
+                if (!this.currentAnalysisId) {
+                    this.showAlert('Сначала проанализируйте фото', 'error');
+                    return;
+                }
+                
+                // Проверка баланса
+                const price = this.db.settings.price_per_analysis;
+                if (this.currentUser.balance < price) {
+                    this.showAlert(`Недостаточно средств для пересчета. Нужно ${price} руб. Пожалуйста, пополните баланс.`, 'error');
+                    document.querySelector('.tab[data-tab="payments"]').click();
+                    return;
+                }
+                
+                const originalAnalysis = this.db.analyses[this.currentAnalysisId];
+                if (!originalAnalysis) {
+                    this.showAlert('Данные анализа не найдены', 'error');
+                    return;
+                }
+                
+                // Пересчитываем значения
+                const ratio = weight / originalAnalysis.weight;
+                const recalculatedData = {
+                    ...originalAnalysis,
+                    weight: weight,
+                    calories: Math.round(originalAnalysis.calories * ratio),
+                    protein: Math.round(originalAnalysis.protein * ratio * 10) / 10,
+                    fat: Math.round(originalAnalysis.fat * ratio * 10) / 10,
+                    carbs: Math.round(originalAnalysis.carbs * ratio * 10) / 10,
+                    bread_units: Math.round(originalAnalysis.bread_units * ratio * 10) / 10
+                };
+                
+                // Списание средств
+                this.db.updateUserBalance(this.currentUser.email, -price);
+                this.currentUser.balance = this.db.users[this.currentUser.email].balance;
+                localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                
+                // Сохраняем пересчитанный анализ
+                const newAnalysisId = this.db.addAnalysis(this.currentUser.email, recalculatedData);
+                this.currentAnalysisId = newAnalysisId;
+                
+                this.displayAnalysisResult(recalculatedData);
+                this.showAlert('Пересчет завершен успешно!', 'success');
+                this.updateUI();
+            }
+            
+            // Чат с AI
+            sendChatMessage() {
+                const input = document.getElementById('chat-input');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                // Добавляем сообщение пользователя
+                this.addChatMessage(message, true);
+                
+                // Очищаем input
+                input.value = '';
+                
+                // Имитируем задержку ответа AI
+                setTimeout(() => {
+                    const response = this.nutritionAI.getResponse(message);
+                    this.addChatMessage(response, false);
+                }, 1000 + Math.random() * 1000);
+            }
+            
+            addChatMessage(message, isUser) {
+                const chatMessages = document.getElementById('chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+                messageDiv.innerHTML = isUser ? 
+                    `<strong>Вы:</strong> ${message}` : 
+                    `<strong>AI-нутрициолог:</strong> ${message}`;
+                
+                chatMessages.appendChild(messageDiv);
+                
+                // Сохраняем в историю
+                if (this.currentUser) {
+                    this.db.addChatMessage(this.currentUser.email, message, isUser);
+                }
+                
+                // Прокручиваем вниз
+                this.scrollChatToBottom();
+            }
+            
+            scrollChatToBottom() {
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            loadChatHistory() {
+                if (!this.currentUser) return;
+                
+                const history = this.db.getChatHistory(this.currentUser.email);
+                const chatMessages = document.getElementById('chat-messages');
+                
+                // Очищаем только если нет стандартного приветствия
+                if (history.length > 0) {
+                    chatMessages.innerHTML = '';
+                }
+                
+                // Добавляем сообщения из истории
+                history.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.is_user ? 'user' : 'bot'}`;
+                    messageDiv.innerHTML = msg.is_user ? 
+                        `<strong>Вы:</strong> ${msg.message}` : 
+                        `<strong>AI-нутрициолог:</strong> ${msg.message}`;
+                    
+                    chatMessages.appendChild(messageDiv);
+                });
+                
+                this.scrollChatToBottom();
+            }
+            
+            // Платежи
+            processPayment() {
+                if (this.selectedPaymentAmount < this.db.settings.min_payment) {
+                    this.showAlert(`Минимальная сумма пополнения: ${this.db.settings.min_payment} руб`, 'error');
+                    return;
+                }
+                
+                // Создаем платеж в базе
+                const paymentId = this.db.createPayment(this.currentUser.email, this.selectedPaymentAmount);
+                
+                // Генерируем ссылку для Robokassa
+                const userId = this.currentUser.email.replace(/[^a-zA-Z0-9]/g, '_');
+                const paymentUrl = this.robokassa.generatePaymentLink(
+                    this.selectedPaymentAmount, 
+                    paymentId, 
+                    userId
+                );
+                
+                // Открываем страницу оплаты
+                window.open(paymentUrl, '_blank');
+                this.showAlert(`Переход на страницу оплаты ${this.selectedPaymentAmount} руб...`, 'info');
+                
+                // Сохраняем информацию о платеже для вебхука
+                this.savePaymentForWebhook(paymentId, this.selectedPaymentAmount, userId);
+            }
+            
+            savePaymentForWebhook(paymentId, amount, userId) {
+                const paymentData = {
+                    payment_id: paymentId,
+                    amount: amount,
+                    user_id: userId,
+                    timestamp: new Date().toISOString(),
+                    status: 'pending'
+                };
+                
+                let webhookPayments = JSON.parse(localStorage.getItem('skanerxe_webhook_payments') || '[]');
+                webhookPayments.push(paymentData);
+                localStorage.setItem('skanerxe_webhook_payments', JSON.stringify(webhookPayments));
+            }
+            
+            checkPendingPayments() {
+                const pendingPayments = this.db.getPendingPayments(this.currentUser.email);
+                const container = document.getElementById('pending-payments');
+                
+                if (pendingPayments.length === 0) {
+                    container.innerHTML = '<p>Нет ожидающих платежей</p>';
+                } else {
+                    let html = '';
+                    pendingPayments.forEach(payment => {
+                        html += `
+                            <div style="padding: 12px; border-bottom: 1px solid #e2e8f0; background: white; border-radius: 6px; margin-bottom: 8px;">
+                                <strong>${payment.amount} руб</strong> - ${payment.status}
+                                <br><small>${new Date(payment.created_at).toLocaleString()}</small>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+                
+                this.showAlert('Проверка платежей завершена', 'success');
+            }
+            
+            startPaymentChecker() {
+                // Эмуляция проверки платежей каждые 30 секунд
+                setInterval(() => {
+                    this.checkWebhookPayments();
+                }, 30000);
+            }
+            
+            checkWebhookPayments() {
+                const webhookPayments = JSON.parse(localStorage.getItem('skanerxe_webhook_payments') || '[]');
+                const now = new Date();
+                
+                webhookPayments.forEach((payment, index) => {
+                    const paymentTime = new Date(payment.timestamp);
+                    const diffMinutes = (now - paymentTime) / (1000 * 60);
+                    
+                    // Эмулируем успешную оплату через 1-3 минуты (случайно)
+                    if (diffMinutes >= (1 + Math.random() * 2) && payment.status === 'pending') {
+                        payment.status = 'completed';
+                        
+                        // Начисляем средства
+                        const userEmail = this.currentUser ? this.currentUser.email : Object.keys(this.db.users)[0];
+                        this.db.updateUserBalance(userEmail, payment.amount);
+                        
+                        // Обновляем статус платежа в основной базе
+                        if (this.db.payments[payment.payment_id]) {
+                            this.db.completePayment(payment.payment_id);
+                        }
+                        
+                        this.showAlert(`Платеж на ${payment.amount} руб завершен! Баланс пополнен.`, 'success');
+                        
+                        if (this.currentUser) {
+                            this.currentUser.balance = this.db.users[this.currentUser.email].balance;
+                            localStorage.setItem('current_user', JSON.stringify(this.currentUser));
+                            this.updateUI();
+                        }
+                    }
+                });
+                
+                localStorage.setItem('skanerxe_webhook_payments', JSON.stringify(webhookPayments));
+            }
+            
+            // Админ-панель
+            loadAdminData() {
+                const stats = this.db.getStats();
+                document.getElementById('stat-users').textContent = stats.total_users;
+                document.getElementById('stat-balance').textContent = stats.total_balance + ' руб';
+                document.getElementById('stat-analyses').textContent = stats.total_analyses;
+                document.getElementById('stat-payments').textContent = stats.pending_payments;
+                
+                document.getElementById('min-payment').value = this.db.settings.min_payment;
+                
+                this.loadUsersList();
+            }
+            
+            loadUsersList() {
+                const users = this.db.getAllUsers();
+                const container = document.getElementById('users-list');
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<p>Нет пользователей</p>';
+                    return;
+                }
+                
+                let html = '';
+                users.forEach(user => {
+                    html += `
+                        <div class="user-item">
+                            <div>
+                                <div class="user-email">${user.email} ${user.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}</div>
+                                <div>Баланс: <span class="user-balance">${user.balance} руб</span> | Бесплатных анализов: ${user.free_requests}</div>
+                                <small>Зарегистрирован: ${new Date(user.created_at).toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            
+            saveSettings() {
+                const minPayment = parseInt(document.getElementById('min-payment').value);
+                
+                if (minPayment < 10) {
+                    this.showAlert('Минимальная сумма не может быть меньше 10 рублей', 'error');
+                    return;
+                }
+                
+                this.db.settings.min_payment = minPayment;
+                this.db.saveSettings();
+                this.showAlert('Настройки сохранены', 'success');
+            }
+            
+            // Вспомогательные методы
+            updateUI() {
+                document.getElementById('balance-amount').textContent = this.currentUser.balance + ' руб';
+                document.getElementById('free-requests').textContent = `Бесплатных анализов: ${this.currentUser.free_requests}/10`;
+                
+                const analyzeBtn = document.getElementById('analyze-btn');
+                const price = this.db.settings.price_per_analysis;
+                
+                if (this.currentUser.free_requests > 0) {
+                    analyzeBtn.innerHTML = `<i class="fas fa-search"></i> Проанализировать (бесплатно, осталось: ${this.currentUser.free_requests})`;
+                } else {
+                    analyzeBtn.innerHTML = `<i class="fas fa-search"></i> Проанализировать (${price} рубль)`;
+                }
+            }
+            
+            loadUserAnalyses() {
+                const analyses = this.db.getUserAnalyses(this.currentUser.email);
+                const container = document.getElementById('history-list');
+                
+                if (analyses.length === 0) {
+                    container.innerHTML = '<p>У вас пока нет анализов</p>';
+                    return;
+                }
+                
+                let html = '';
+                analyses.slice(0, 15).forEach(analysis => {
+                    html += `
+                        <div class="history-item">
+                            <div class="history-date">${new Date(analysis.created_at).toLocaleString()}</div>
+                            <div class="history-dish">${analysis.dish_name}</div>
+                            <div class="history-calories">${analysis.calories} ккал | ${analysis.weight} г</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} fade-in`;
+                alertDiv.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                `;
+                
+                const mainContent = document.querySelector('.main-content');
+                mainContent.insertBefore(alertDiv, mainContent.firstChild);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            window.skanerXEApp = new SkanerXEApp();
+        });
+    </script>
 </body>
 </html>
